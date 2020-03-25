@@ -1,4 +1,4 @@
-#Problem 
+# Problem 
 	"C++ Coin Contract:: for serial miner and validator execution."
 # Last Modified
 	<< 20-08-2018 >>

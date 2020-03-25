@@ -1,4 +1,4 @@
-#Problem 
+# Problem 
 	"Mix Contract (Coin, Simple Auction, and Ballot) in C++."
 
 # Version
@@ -7,7 +7,7 @@
 # Last Modified
 	<< 04-01-2020, 10:40 AM >>
 
-# Submitted By
+# Developed By
 	CS17RESCH11004
 
 # Content

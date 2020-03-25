@@ -1,11 +1,10 @@
-#Problem 
+# Problem 
 	"C++ Coin Contract:: for serial miner and validator execution."
 
 # Last Modified
 	<< 20-08-2018, 03:40 PM >>
 
-# Submitted By
-	
+# Developed By	
 	Parwat Singh Anjana 
 	CS17RESCH11004
 

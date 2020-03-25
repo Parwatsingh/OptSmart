@@ -1,4 +1,4 @@
-#Problem 
+# Problem 
 	"Mix Contract (Coin, Simple Auction, and Ballot) Using STM BTO library Instrumentation for Concurrent Miner Execution."
 
 # Version
@@ -8,7 +8,7 @@
 	<< 05-03-2019 >>
 
 # Team Member
-	Parwat Singh Anjana, Sweta Kumari, Sathya Peri, Sachin Rathor, Archit Somani.
+	Parwat Singh Anjana, Sweta Kumari, Sathya Peri, Archit Somani.
 
 # Content
 

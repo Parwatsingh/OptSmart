@@ -1,4 +1,4 @@
-#Problem 
+# Problem 
 	"Mix Contract (Coin, Simple Auction, and Ballot) Using STM BTO library Instrumentation for Concurrent Miner Execution."
 
 # Version
@@ -8,7 +8,7 @@
 # Last Modified
 	<< 05-10-2018, 10:40 AM >>
 
-# Submitted By
+# Developed By
 	
 	Parwat Singh Anjana 
 	CS17RESCH11004

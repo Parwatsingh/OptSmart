@@ -1,4 +1,4 @@
-#Problem 
+# Problem 
 	"Coin Contract Using MVOSTM library Instrumentation for Concurrent Miner Execution."
 
 # Version

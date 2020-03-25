@@ -1,4 +1,4 @@
-#Problem 
+# Problem 
 	"Mix Contract (Coin, Simple Auction, and Ballot) Using OSTM library Instrumentation for Concurrent Miner Execution."
 
 # Version
