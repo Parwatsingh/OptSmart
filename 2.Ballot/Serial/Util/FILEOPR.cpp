@@ -5,9 +5,9 @@
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 float FILEOPR::getRBal( ) 
 {
-	random_device rd;                          //Random seed
-	mt19937 gen(rd());                         //Initialize Mersenne Twister pseudo-random number generator
-	uniform_int_distribution<> dis( 1, 1000 ); //Uniformly distributed in range (1, 1000)
+	random_device rd;  //Random seed
+	mt19937 gen(rd()); //Init Mersenne Twister pseudo-random number generator
+	uniform_int_distribution<> dis(1, 1000); //Uniformly distributed in(1, 1000)
 	int num = dis(gen);
 	return num;
 }
@@ -37,10 +37,15 @@ int FILEOPR::getRFunC( int nCFun )
 }
 
 
-/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! getInp() reads #Shared Objects, #Threads, #AUs, & random delay seed "Lemda" from input file !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-void FILEOPR::getInp(int* nProposal, int* nVoter, int *nThreads, int* nAUs, double* lemda) 
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! getInp() reads #Shared Objects, #Threads, #AUs, !
+!!! & random delay seed "Lemda" from input file     !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+void FILEOPR::getInp(int* nProposal,
+                     int* nVoter,
+                     int *nThreads,
+                     int* nAUs,
+                     double* lemda) 
 {
 	string ipBuffer[5]; //stores input from file
 	ifstream inputFile;
@@ -70,14 +75,21 @@ void FILEOPR::getInp(int* nProposal, int* nVoter, int *nThreads, int* nAUs, doub
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! writeOpt() stores the Time taken by algorithm in output file "Time.txt"  !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-void FILEOPR::writeOpt( int nProposal, int nVoter, int nThreads, int nAUs, double TTime[], 
-						float_t mTTime[], float_t vTTime[], int aCount[], int vAUs, 
-						list<double>&mIT, list<double>&vIT)
+void FILEOPR::writeOpt( int nProposal,
+                        int nVoter,
+                        int nThreads,
+                        int nAUs,
+                        double TTime[],
+                        float_t mTTime[],
+                        float_t vTTime[],
+                        int aCount[],
+                        int vAUs,
+                        list<float>&mIT,
+                        list<float>&vIT)
 {
 	ofstream out;
-	
-	out.open("inp-output/Time.txt");
-	
+	out.open("inp-output/Time.csv");
+	int n = nThreads;
 	float_t t_Time[2];
 	t_Time[0] = 0;//total time miner thread
 	t_Time[1] = 0;//total time validator thred
@@ -86,10 +98,10 @@ void FILEOPR::writeOpt( int nProposal, int nVoter, int nThreads, int nAUs, doubl
 	//cout<<"\nTime Taken By Miner Threads:\n";
 	out <<"\nTime Taken By Miner Threads:\n";
 	//cout<<"=============================\n";
-	for(int i = 0; i < nThreads; i++) 
+	for(int i = 0; i < n; i++) 
 	{
-	//	cout<<"THREAD "<< i << " = "<< mTTime[i] <<" microseconds\n";
-		out <<"THREAD "<< i << " = "<< mTTime[i] <<" microseconds\n";
+	//	cout<<"THREAD "<< i << "\t =\t "<< mTTime[i] <<" \t microseconds\n";
+		out <<"THREAD "<< i << "\t =\t "<< mTTime[i] <<" \t microseconds\n";
 		t_Time[0] = t_Time[0] + mTTime[i];
 	}
 
@@ -97,71 +109,48 @@ void FILEOPR::writeOpt( int nProposal, int nVoter, int nThreads, int nAUs, doubl
 	//cout<<"\nTime Taken By Validator Threads:\n";
 	out <<"\nTime Taken By Validator Threads:\n";
 	//cout<<"================================\n";
-	for(int i = 0; i < nThreads; i++) 
+	for(int i = 0; i < n; i++) 
 	{
-	//	cout<<"THREAD "<< i << " = "<< vTTime[i] <<" microseconds\n";
-		out <<"THREAD "<< i << " = "<< vTTime[i] <<" microseconds\n";
+	//	cout<<"THREAD "<< i << "\t =\t "<< vTTime[i] <<" \t microseconds\n";
+		out <<"THREAD \t"<< i << "\t =\t "<< vTTime[i] <<" \t microseconds\n";
 		t_Time[1] = t_Time[1] + vTTime[i];
 	}
-	
-	//cout<<"\n[ # Proposal Shared Objects = "<< nProposal<<"\n[ # Voter Shared Objects = "<< nVoter 
-	//			<<" ]\n[ # Threads = "<< nThreads << " ]\n[ # Total AUs = " << nAUs << " ]\n";
-	out <<"\n[ # Proposal Shared Objects = "<< nProposal<<"\n[ # Voter Shared Objects = "<< nVoter
-		<<" ]\n[ # Threads = "<< nThreads << " ]\n[ # Total AUs = " << nAUs << " ]\n";
 
 
 	int total_Abort = 0;	
-	for(int i = 0; i < nThreads; i++)
+	for(int i = 0; i < n; i++)
+	{
 		total_Abort = total_Abort + aCount[i];
-	
-	//	cout<<" Total Aborts = "<<total_Abort;
-	out <<"[ # Total Aborts = "<<total_Abort<<" ]\n\n";
+	}	
+//	cout<<" Total Aborts = "<<total_Abort;
+	out <<" # Total Aborts \t = \t"<<total_Abort<<"\n\n";
 	
 	//Average Time Taken by one Miner Thread = Total Time/# Threads
-	out <<"\n\nAverage Time Taken by a Miner     Thread        = "<<t_Time[0]/nThreads << " microseconds\n";
-//	cout<<"\n    Avg Miner = "<<t_Time[0]/nThreads<<" microseconds\n";
-	mIT.push_back(t_Time[0]/nThreads);
+	out <<"\n\nAverage Time Taken by a Miner     Thread      \t  = \t "
+	    <<t_Time[0]/n << " \t microseconds\n";
+//	cout<<"\n    Avg Miner = "<<t_Time[0]/n<<" \t microseconds\n";
+	mIT.push_back(t_Time[0]/n);
 
 	//Average Time Taken by one Validator Thread = Total Time/# Threads
-	out <<"Average Time Taken by a Validator Thread        = "<<t_Time[1]/nThreads<<" microseconds\n";
-//	cout<<"Avg Validator = "<<t_Time[1]/nThreads<<" microseconds\n";
-	vIT.push_back(t_Time[1]/nThreads);
+	out <<"Average Time Taken by a Validator Thread      \t  = \t "
+	    <<t_Time[1]/n << " \t microseconds\n";
+//	cout<<"Avg Validator = "<<t_Time[1]/n<<" \t microseconds\n";
+	vIT.push_back(t_Time[1]/n);
 
-
-	//Average Time Taken/AU by Miner = Total Time/# AUs
-//	out <<"Average Time Taken per Atomic Unit by Miner     = "<<t_Time[0]/nAUs<<" microseconds\n";
-//	cout<<"\n\nAverage Time Taken per Atomic Unit by Miner     = "<<t_Time[0]/nAUs<<" microseconds\n";
-	
-	//Average Time Taken/AU by Miner = Total Time/# AUs
-//	out <<"Average Time Taken per Atomic Unit by Validator = "<<t_Time[1]/vAUs<<" microseconds\n";
-//	cout<<"Average Time Taken per Atomic Unit by Validator = "<<t_Time[1]/vAUs<<" microseconds\n";
-	
-	
-	
-	//Total Time Taken by Miner Algorithm = max time taken by a thread
-//	cout<<"\nTotal Time taken by Miner     Algorithm  = "<<TTime[0]*1000<<" microseconds\n";
-//	out <<"\nTotal Time taken by Miner     Algorithm  = "<<TTime[0]*1000<<" microseconds\n";
-	
-	//Total Time Taken by Validator Algorithm = max time taken by a thread
-//	cout<<"Total Time taken by Validator Algorithm  = "<<TTime[1]*1000<<" microseconds\n";
-//	out <<"Total Time taken by Validator Algorithm  = "<<TTime[1]*1000<<" microseconds\n\n";
-	
-
-	//Total Avg Time Taken by Both Algorithm Threads
-//	cout<<"Total (M + V) = "<<(t_Time[0]/nThreads + t_Time[1]/nThreads)<<" microseconds\n";
-	out <<"\nTotal Average Time (Miner + Validator)  = "<<(t_Time[0]/nThreads + t_Time[1]/nThreads)<<" microseconds\n";	
-	
 	out.close( );
 	return;
 }
-	
-	
-	
-/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! genAUs() generate and store the Atomic Unites (transactions to be executed by miner/validator) in a list & file !!!
-!!! nFunC: parallel fun's (AUs) in smart contract, numAUs: number of AUs to be requested by client to execute       !!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-void FILEOPR::genAUs(int numAUs, int numVoter, int numProposal, int nFunC, vector<string>& ListAUs)
+
+
+
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! genAUs() generate and store the Atomic Unites (transactions !!! 
+!!! to be executed by miner/validator) in a list & file         !!!
+!!! nFunC: parallel fun's (AUs) in smart contract, numAUs:      !!!
+!!! number of AUs to be requested by client to execute          !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+void FILEOPR::genAUs(int numAUs, int numVoter, int numProposal,
+                     int nFunC, vector<string>& ListAUs)
 {
 	std::ifstream input( "inp-output/listAUs.txt" );
 	for( std::string trns; getline( input, trns ); )
@@ -181,7 +170,7 @@ void FILEOPR::genAUs(int numAUs, int numVoter, int numProposal, int nFunC, vecto
 	//cout<<"---------------------\n";
 	while(auCount <= numAUs)
 	{
-		int funName = getRFunC( nFunC );//gives contract func: 1 = "delegate()" and 2 = "vote()"
+		int funName = getRFunC( nFunC );
 		if(funName == 1)
 		{
 				int from = getRId(numVoter);
@@ -193,7 +182,8 @@ void FILEOPR::genAUs(int numAUs, int numVoter, int numProposal, int nFunC, vecto
 				}
 				//int ammount = getRBal( );
 				
-				string t = to_string(auCount)+" delegate "+to_string(from)+" "+to_string(to)+"\n";
+				string t = to_string(auCount)+" delegate "
+				          +to_string(from)+" "+to_string(to)+"\n";
 				//cout<<" "+t;
 				out_file << t;
 				ListAUs.push_back(t);
@@ -203,7 +193,8 @@ void FILEOPR::genAUs(int numAUs, int numVoter, int numProposal, int nFunC, vecto
 		{
 				int vID  = getRId(numVoter);//voter ID
 				int pID  = getRId(numProposal);//proposalID
-				string t = to_string(auCount)+" vote "+to_string(vID)+" "+to_string(pID)+"\n";
+				string t = to_string(auCount)+" vote "
+				          +to_string(vID)+" "+to_string(pID)+"\n";
 				
 				out_file << t;
 				//cout<<" "+t;

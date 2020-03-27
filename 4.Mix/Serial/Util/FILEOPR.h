@@ -23,13 +23,22 @@ class FILEOPR
 		
 	
 	void getInp(int input[]);
-	void writeOpt(int n, int K,
-					double total_time[], float_t mTTime[],
-						float_t vTTime[], int aCount[], int validAUs,
-										list<double>&mIT, list<double>&vIT);
 
-	void genAUs(int input[], int nCF, int nBF, 
-					int nAF, vector<string>& ListAUs);
+	void writeOpt(int n,
+	              int K,
+	              double total_time[],
+	              float_t mTTime[],
+	              float_t vTTime[],
+	              int aCount[],
+	              int validAUs,
+	              list<float>&mIT,
+	              list<float>&vIT);
+
+	void genAUs(int input[],
+	            int nCF,
+	            int nBF, 
+	            int nAF,
+	            vector<string>& ListAUs);
 	
 	void printCList(int AU_ID, list<int>&CList);
 

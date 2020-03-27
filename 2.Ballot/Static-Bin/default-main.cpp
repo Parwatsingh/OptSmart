@@ -26,7 +26,6 @@ using namespace std::chrono;
 
 int NumBlock     = 26;    //! at least two blocks, the first run is warmup run.
 int numValidator = 50;
-
 int    nProposal = 2;     //! nProposal: number of proposal shared objects; default is 1.
 int    nVoter    = 1;     //! nVoter: number of voter shared objects; default is 1.
 int    nThread   = 1;     //! nThread: total number of concurrent threads; default is 1.
@@ -81,8 +80,8 @@ void shoot() {
 
 /*************************MINER CODE BEGINS*****************************/
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!    Class "Miner" CREATE & RUN "n" miner-THREAD CONCURRENTLY           !
-!"concMiner()" CALLED BY miner-THREAD TO PERFROM oprs of RESPECTIVE AUs !
+!    Class "Miner" create & run "n" miner-thread concurrently           !
+!"concMiner()" called by miner-thread to perfrom oprs of respective AUs !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 class Miner
 {
@@ -734,13 +733,10 @@ int main(int argc, char *argv[])
 	//Validator Sequential Phase Time
 	float avgVStime = tSeqVT/(nItertion*NumBlock*numValidator);
 
-
-	cout<<"Avg Miner      Time in microseconds = "
+	cout<<  "Avg Miner      Time in microseconds = "
 	    <<(tMiner/nItertion)+avgMStime+avgMAtime;
-
 	cout<<"\nAvg Validator  Time in microseconds = "
 	    <<(tVal/nItertion)+avgVStime;
-
 	cout<<"\n-----------------------------";
 	cout<<"\nStaic Analysis Time in microseconds = "<<avgMAtime;
 	cout<<"\nMiner      Seq Time in microseconds = "<<avgMStime
@@ -759,4 +755,4 @@ int main(int argc, char *argv[])
 	delete vTTime;
 	return 0;
 }
-/*************************MAIN FUN CODE ENDS***********************************/
+/*********************MAIN FUN CODE ENDS***********************/

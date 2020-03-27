@@ -5,9 +5,9 @@
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 float FILEOPR::getRBal( ) 
 {
-	random_device rd;                          //Random seed
-	mt19937 gen(rd());                         //Initialize Mersenne Twister pseudo-random number generator
-	uniform_int_distribution<> dis( 1, 1000 ); //Uniformly distributed in range (1, 1000)
+	random_device rd; //Random seed
+	mt19937 gen(rd());//Init Mersenne Twister pseudo-random number generator
+	uniform_int_distribution<> dis(1, 1000); //Uniformly distributed in(1, 1000)
 	int num = dis(gen);
 	return num;
 }
@@ -70,7 +70,16 @@ void FILEOPR::getInp(int* m, int* n, int* K, double* lemda )
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! writeOpt() stores the Time taken by algorithm in output file "Time.txt"  !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-void FILEOPR::writeOpt(int m,int n,int K,double total_time[],float_t mTTime[],float_t vTTime[],int aCount[],int validAUs,list<float>&mIT,list<float>&vIT)
+void FILEOPR::writeOpt(int m,
+                       int n,
+                       int K,
+                       double total_time[], 
+                       float_t mTTime[],
+                       float_t vTTime[],
+                       int aCount[],
+                       int validAUs,
+                       list<float>&mIT,
+                       list<float>&vIT)
 {
 	ofstream out;
 	out.open("inp-output/Time.csv");
@@ -129,9 +138,9 @@ void FILEOPR::writeOpt(int m,int n,int K,double total_time[],float_t mTTime[],fl
 	out.close( );
 	return;
 }
-	
-	
-	
+
+
+
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! genAUs() generate and store the Atomic Unites (transactions !!! 
 !!! to be executed by miner/validator) in a list & file         !!!
@@ -163,7 +172,7 @@ void FILEOPR::genAUs(int numAUs, int SObj, int nFunC, vector<string>& ListAUs)
 	int cgetBalCount = 1, SendABCount = 1;
 	while(auCount <= numAUs)
 	{
-		int funName = getRFunC( nFunC );//gives contract func: 1 = "send()" and 2 = "get_bal()"
+		int funName = getRFunC( nFunC );
 		if(funName == 1)
 		{
 			if(SendABCount <= sendAB)
@@ -177,7 +186,9 @@ void FILEOPR::genAUs(int numAUs, int SObj, int nFunC, vector<string>& ListAUs)
 				}
 				int ammount = getRBal( );
 				
-				string trns = to_string(auCount)+" send "+to_string(from)+" "+to_string(to)+" "+to_string(ammount)+"\n";
+				string trns = to_string(auCount)+" send "
+				             +to_string(from)+" "+to_string(to)+" "
+				             +to_string(ammount)+"\n";
 				//cout<<" "+trns;
 				out_file << trns;
 				ListAUs.push_back(trns);

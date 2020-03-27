@@ -372,10 +372,6 @@ class Validator
 		{
 			//! get the AU to execute, which is of string type.
 			int AU_id_t = concBin[curInd];
-
-//			string str = "\nThread "+to_string(t_ID)+" executing AU "+listAUs[AU_id_t];
-//			cout<<str<<endl;
-
 			istringstream ss(listAUs[AU_id_t-1]);
 			string tmp;
 			ss >> tmp;

@@ -33,16 +33,16 @@ float_t*mTTime;            //! time taken by each miner Thread to execute AUs (T
 float_t*vTTime;            //! time taken by each validator Thread to execute AUs (Transactions).
 vector<string>listAUs;     //! holds AUs to be executed on smart contract: "listAUs" index+1 represents AU_ID.
 std::atomic<int>currAU;    //! used by miner-thread to get index of Atomic Unit to execute.
+
+//State Data
 int *mState;
 int *vState;
 
 
-
-
-/*************************Miner code begins************************************/
-/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!    Class "Miner" CREATE & RUN "1" miner-THREAD                        !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+/*************************MINER CODE BEGINS***********************/
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!    Class "Miner" CREATE & RUN "1" miner-THREAD                  !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 class Miner
 {
 	public:
@@ -61,9 +61,9 @@ class Miner
 		coin = new Coin( SObj, minter_id );
 	}
 
-	//!------------------------------------------------------------------------- 
-	//!!!!!!!! MAIN MINER:: CREATE MINER + GRAPH CONSTRUCTION THREADS !!!!!!!!!!
-	//!-------------------------------------------------------------------------
+	//!----------------------------- 
+	//!!!!!!!! MAIN MINER !!!!!!!!!!
+	//!-----------------------------
 	void mainMiner()
 	{
 		Timer lTimer;
@@ -99,25 +99,21 @@ class Miner
 		int curInd = currAU++;
 		//! statrt clock to get time taken by this.AU
 		auto start = thTimer._timeStart();
-		while( curInd < numAUs )
-		{
+		while( curInd < numAUs ) {
 			//!get the AU to execute, which is of string type.
 			istringstream ss(listAUs[curInd]);
 			string tmp;
 			ss >> tmp;
 			int AU_ID = stoi(tmp);
-			//! Function Name (smart contract).
 			ss >> tmp;
-			if( tmp.compare("get_bal") == 0 )
-			{
+			if( tmp.compare("get_bal") == 0 ) {
 				ss >> tmp;
 				int s_id = stoi(tmp);
 				int bal  = 0;
 				//! get_bal() of smart contract.
 				bool v = coin->get_bal(s_id, &bal);
 			}
-			if( tmp.compare("send") == 0 )
-			{
+			if( tmp.compare("send") == 0 ) {
 				ss >> tmp;
 				int s_id = stoi(tmp);
 				ss >> tmp;
@@ -130,15 +126,14 @@ class Miner
 			//! get the current index to execute, and increment it.
 			curInd = currAU++;
 		}
-		mTTime[t_ID] = mTTime[t_ID] + thTimer._timeStop(start);
+		mTTime[t_ID] +=  thTimer._timeStop(start);
 	}
 
-	//!-------------------------------------------------
-	//!FINAL STATE OF ALL THE SHARED OBJECT. Once all  |
-	//!AUs executed. Geting this using get_bel_val()   |
-	//!-------------------------------------------------
-	void finalState()
-	{
+	//!------------------------------------------
+	//!Final state of all the shared object.    |
+	//! Once all AUs executed.                  |
+	//!------------------------------------------
+	void finalState() {
 		for(int sid = 1; sid <= SObj; sid++) {
 			int bal = 0;
 			//! get_bal() of smart contract.
@@ -149,22 +144,18 @@ class Miner
 
 	~Miner() { };
 };
-/*************************Miner code ends**************************************/
+/*********************MINER CODE ENDS*************************/
 
 
 
 
-
-
-
-/*************************Validator code begins********************************/
+/*************************VALIDATOR CODE BEGINS****************/
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Class "Validator" CREATE & RUN "1" validator-THREAD          !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 class Validator
 {
-public:
-
+	public:
 	Validator(int minter_id)
 	{
 		//! initialize the counter to 0.
@@ -193,11 +184,10 @@ public:
 		}
 
 		//!-----------------------------------------------------
-		//!!!!!!!!!!    CREATE 1 VALIDATOR THREADS      !!!!!!!!
+		//!!!!!!!!!!    CREATE 1 VALIDATOR THREAD       !!!!!!!!
 		//!-----------------------------------------------------
 		double start = lTimer.timeReq();
-		for(int i = 0; i < nThread; i++)
-			T[i] = thread(concValidator, i, numAUs);
+		for(int i = 0; i < nThread; i++) T[i] = thread(concValidator, i, numAUs);
 		for(auto& th : T) th.join();
 		tTime[1] = lTimer.timeReq() - start;
 	
@@ -206,7 +196,7 @@ public:
 	}
 
 	//!------------------------------------------------------
-	//! THE FUNCTION TO BE EXECUTED BY A VALIDATOR THREADS. !
+	//! THE FUNCTION TO BE EXECUTED BY A VALIDATOR THREAD.  !
 	//!------------------------------------------------------
 	static void concValidator( int t_ID, int numAUs)
 	{
@@ -218,24 +208,21 @@ public:
 
 		//! statrt clock to get time taken by this.AU
 		auto start = tTimer._timeStart();
-		while( curInd < numAUs )
-		{
+		while( curInd < numAUs ) {
 			//!get the AU to execute, which is of string type.
 			istringstream ss(listAUs[curInd]);
 			string tmp;
 			ss >> tmp;//! AU_ID to Execute.
 			int AU_ID = stoi(tmp);
 			ss >> tmp;//! Function Name (smart contract).
-			if( tmp.compare("get_bal") == 0 )
-			{
+			if( tmp.compare("get_bal") == 0 ) {
 				ss >> tmp;//! get balance of SObj/id.
 				int s_id = stoi(tmp);
 				int bal  = 0;
 				//! get_bal() of smart contract.
 				bool v = coinV->get_bal(s_id, &bal);
 			}
-			if( tmp.compare("send") == 0 )
-			{
+			if( tmp.compare("send") == 0 ) {
 				ss >> tmp;
 				int s_id = stoi(tmp);
 				ss >> tmp;
@@ -247,15 +234,14 @@ public:
 			//! get the current index to execute, and increment it.
 			curInd = currAU++;
 		}
-		vTTime[t_ID] = vTTime[t_ID] + tTimer._timeStop(start);
+		vTTime[t_ID] += tTimer._timeStop(start);
 	}
 
-	//!-------------------------------------------------
-	//! FINAL STATE OF ALL THE SHARED OBJECT. ONCE ALL |
-	//! AUS EXECUTED. GETING THIS USING get_bel.       |
-	//!-------------------------------------------------
-	void finalState()
-	{
+	//!------------------------------------------
+	//! Final state of all the shared object.   |
+	//! Once all AUs executed.                  |
+	//!------------------------------------------
+	void finalState() {
 		for(int sid = 1; sid <= SObj; sid++) {
 			int bal = 0;
 			//! get_bal() of smart contract.
@@ -266,10 +252,12 @@ public:
 
 	~Validator() { };
 };
-/*************************Validator code ends**********************************/
+/******************VALIDATOR CODE ENDS*****************************/
 
 
-
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+/*!!!!!!!!     State Validation    !!!!!!!!!!*/
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 bool stateVal() {
 	//State Validation
 	bool flag = false;
@@ -284,13 +272,11 @@ bool stateVal() {
 
 
 
-
-/*************************Main Fun code begins*********************************/
+/**********************MAIN FUN CODE BEGINS************************/
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-/*!!!!!!!!!!!!!!!   main() !!!!!!!!!!!!!!!!!!*/
+/*!!!!!!!!          main()         !!!!!!!!!!*/
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	cout<<pl<<"Serial Miner and Serial Validator\n";
 	cout<<"--------------------------------\n";
 
@@ -312,12 +298,11 @@ int main(int argc, char *argv[])
 	int tMaxAcc   = 0;
 
 	//! list holds the avg time taken by miner and validator
-	//!  threads for multiple consecutive runs of the algorithm.
+	//! threads for multiple consecutive runs of the algorithm.
 	list<float>mItrT;         
 	list<float>vItrT;	
-	int totalRun = NumBlock; //at least 2
+	int totalRun     = NumBlock; //at least 2
 	int maxAccepted  = 0;
-	int totalDepInG  = 0; //to get total number of dependencies in graph;
 	int totalRejCont = 0; //number of validator rejected the blocks;
 
 	FILEOPR file_opr;
@@ -359,40 +344,30 @@ int main(int argc, char *argv[])
 			miner ->mainMiner();
 
 			//VALIDATOR
-			if(MValidation == true)
+			int acceptCount = 0, rejectCount = 0;
+			for(int nval = 0; nval < numValidator; nval++)
 			{
-				int acceptCount = 0, rejectCount = 0;
-				for(int nval = 0; nval < numValidator; nval++)
-				{
-					Validator *validator = new Validator(0);
-					validator ->mainValidator();
-
-					//State Validation
-					bool flag = stateVal();
-					if(flag == true) rejectCount++;
-					else acceptCount++;
-				}
-				if(nBlock > 0) {
-					totalRejCont += rejectCount;
-					if(maxAccepted < acceptCount ) maxAccepted = acceptCount;
-				}
-				for(int i = 1; i <= SObj; i++) vState[i] = 0;
-			}
-			else {
 				Validator *validator = new Validator(0);
+				validator ->mainValidator();
+
 				//State Validation
 				bool flag = stateVal();
-				if(flag == true) cout<<"\nBlock Rejected by Validator";
+				if(flag == true) rejectCount++;
+				else acceptCount++;
 			}
-
+			if(nBlock > 0) {
+				totalRejCont += rejectCount;
+				if(maxAccepted < acceptCount ) maxAccepted = acceptCount;
+			}
+			for(int i = 1; i <= SObj; i++) vState[i] = 0;
 			mTimer.stop();
 
 			//total valid AUs among List-AUs executed
 			//by Miner & varified by Validator.
 			int vAUs = numAUs - aCount[0];
 			if(nBlock > 0)
-				file_opr.writeOpt(SObj, nThread, numAUs, tTime, mTTime,
-					                    vTTime, aCount, vAUs, mItrT, vItrT);
+			file_opr.writeOpt(SObj, nThread, numAUs, tTime, mTTime,
+			                  vTTime, aCount, vAUs, mItrT, vItrT);
 
 			for(int i = 1; i <= SObj; i++) {
 				mState[i]     = 0;

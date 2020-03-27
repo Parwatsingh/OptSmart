@@ -1,15 +1,16 @@
-# Problem 
-	"Mix Contract (Coin, Simple Auction, and Ballot) in C++."
+# Description 
+Graph library define different concurrent graph construction algorithm.
 
 # Version
-	<< Version 2.0  >>
-	
+<< Version 1.2 >>
+
 # Last Modified
-	<< 04-01-2020, 10:40 AM >>
+<< 24-08-2018 >>
 
 # Developed By
-	CS17RESCH11004
+Parwat Singh Anjana 
+CS17RESCH11004
 
 # Content
-	1.< Mix.h >     :::: Header file defines <Mix Smart Contract> functions (Standerd Solidity Coin, Simple Auction, and Ballot Contract functions are Converted into C++, each Contract is represented as one class).
-	2.< README.md > :::: This File.
+1.< LockFree/Graph.h >  ::::  Header file defines Lock-Free Graph Construction functions using CAS.
+2.< README.md >         ::::  This File.

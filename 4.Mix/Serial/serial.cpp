@@ -19,16 +19,17 @@
 #define maxBidrObj 5000   //maximum simple auction contract \bidder\ shared object.
 #define maxbEndT 6000      //maximum simple auction contract \bidding time out\ duration.
 #define AFConut 6         //# methods in simple auction contract.
-#define pl "=================================================================\n"
-#define MValidation true   //! true or false
-#define numValidator 50
+#define pl "===================================================\n"
 #define InitBalance 1000
-#define NumBlock 26        //! at least two blocks, the first run is warmup run.
-
-
+#define MValidation true   //! true or false
+#define malMiner true      //! set the flag to make miner malicious.
+#define NumOfDoubleSTx 2   //! # double-spending Tx for malicious final state by Miner, multiple of 2.
 
 using namespace std;
 using namespace std::chrono;
+
+int NumBlock     = 26;     //! at least two blocks, the first run is warmup run.
+int numValidator = 50;
 
 //! INPUT FROM INPUT FILE.
 int nThread;    //! # of concurrent threads;
@@ -46,6 +47,7 @@ float_t*mTTime;          //! time taken by each miner Thread to execute AUs.
 float_t*vTTime;          //! time taken by each validator Thread to execute AUs.
 vector<string>listAUs;   //! AUs to be executed on contracts: index+1 => AU_ID.
 std::atomic<int>currAU;  //! used by miner-thread to get index of AU to execute.
+
 //! CONTRACT OBJECTS;
 Coin   *coin;            //! coin contract miner object.
 Coin   *coinV;           //! coin contract validator object.
@@ -55,6 +57,8 @@ SimpleAuction *auction;  //! simple auction contract for miner object.
 SimpleAuction *auctionV; //! simple auction contract for validator object.
 string *proposalNames;   //! proposal names for ballot contract.
 
+
+//State Data
 int *mCoinState;
 int *vCoinState;
 int *mBallotProState;
@@ -69,9 +73,10 @@ int *mPendingRet;
 int *vPendingRet;
 
 
-/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!    Class "Miner" CREATE & RUN "1" miner-THREAD                        !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+/*************************MINER CODE BEGINS***********************/
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!    Class "Miner" CREATE & RUN "1" miner-THREAD                  !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 class Miner
 {
 	public:
@@ -97,9 +102,9 @@ class Miner
 		auction = new SimpleAuction(bidEndT, 0, nBidder);
 	}
 
-	//!--------------------------------------
-	//!!!!!!!! MAIN MINER:: CREATE MINER !!!!
-	//!--------------------------------------
+	//!----------------------------- 
+	//!!!!!!!! MAIN MINER !!!!!!!!!!
+	//!-----------------------------
 	void mainMiner()
 	{
 		Timer lTimer;
@@ -119,12 +124,11 @@ class Miner
 			ballot->giveRightToVote(0, voter);
 		}
 
-		//!---------------------------------------------------------
-		//!!!!!!!!!!    CREATE NTHREAD MINER THREADS      !!!!!!!!!!
-		//!---------------------------------------------------------
+		//!---------------------------------------------------
+		//!!!!!!!!!!    CREATE 1 MINER THREADS      !!!!!!!!!!
+		//!---------------------------------------------------
 		double start = lTimer.timeReq();
-		for(int i = 0; i < nThread; i++) 
-			T[i] = thread(concMiner, i, numAUs);
+		for(int i = 0; i < nThread; i++) T[i] = thread(concMiner, i, numAUs);
 		for(auto& th : T) th.join();
 		tTime[0] = lTimer.timeReq() - start;
 
@@ -135,9 +139,9 @@ class Miner
 //		auction->AuctionEnded( );
 	}
 
-	//!--------------------------------------------------------
-	//! The function to be executed by all the miner threads. !
-	//!--------------------------------------------------------
+	//!--------------------------------------------------
+	//! The function to be executed by a miner threads. !
+	//!--------------------------------------------------
 	static void concMiner( int t_ID, int numAUs)
 	{
 		Timer thTimer;
@@ -145,23 +149,20 @@ class Miner
 		int curInd = currAU++;
 		//! statrt clock to get time taken by this.AU
 		auto start = thTimer._timeStart();
-		while( curInd < numAUs )
-		{
+		while( curInd < numAUs ) {
 			//!get the AU to execute, which is of string type.
 			istringstream ss(listAUs[curInd]);
 			string tmp;
 			ss >> tmp;
 			int AU_ID = stoi(tmp);
 			ss >> tmp;
-			if( tmp.compare("get_bal") == 0 )
-			{
+			if( tmp.compare("get_bal") == 0 ) {
 				ss >> tmp;
 				int s_id = stoi(tmp);
 				int bal  = 0;
 				bool v = coin->get_bal(s_id, &bal);
 			}
-			if( tmp.compare("send") == 0 )
-			{
+			if( tmp.compare("send") == 0 ) {
 				ss >> tmp;
 				int s_id = stoi(tmp);
 				ss >> tmp;
@@ -171,8 +172,7 @@ class Miner
 				bool v  = coin->send(s_id, r_id, amt);
 				if(v == false) aCount[t_ID]++;
 			}
-			if(tmp.compare("vote") == 0)
-			{
+			if(tmp.compare("vote") == 0) {
 				ss >> tmp;
 				int vID = stoi(tmp);//! voter ID
 				ss >> tmp;
@@ -180,8 +180,7 @@ class Miner
 				int v = ballot->vote(vID, pID);
 				if(v != true) aCount[0]++;
 			}
-			if(tmp.compare("delegate") == 0)
-			{
+			if(tmp.compare("delegate") == 0) {
 				ss >> tmp;
 				int sID = stoi(tmp);//! Sender ID
 				ss >> tmp;
@@ -189,8 +188,7 @@ class Miner
 				int v = ballot->delegate(sID, rID);
 				if(v != true) aCount[0]++;
 			}
-			if(tmp.compare("bid") == 0)
-			{
+			if(tmp.compare("bid") == 0) {
 				ss >> tmp;
 				int payable = stoi(tmp);//! payable
 				ss >> tmp;
@@ -200,58 +198,55 @@ class Miner
 				bool v = auction->bid(payable, bID, bAmt);
 				if(v != true) aCount[0]++;
 			}
-			if(tmp.compare("withdraw") == 0)
-			{
+			if(tmp.compare("withdraw") == 0) {
 				ss >> tmp;
 				int bID = stoi(tmp);//! Bidder ID
 
 				bool v = auction->withdraw(bID);
 				if(v != true) aCount[0]++;
 			}
-			if(tmp.compare("auction_end") == 0)
-			{
+			if(tmp.compare("auction_end") == 0) {
 				bool v = auction->auction_end( );
 				if(v != true) aCount[0]++;
 			}
 			//! get the current index to execute, and increment it.
 			curInd = currAU++;
 		}
-		mTTime[t_ID] = mTTime[t_ID] + thTimer._timeStop(start);
+		mTTime[t_ID] += thTimer._timeStop(start);
 	}
 
-	//!-------------------------------------------------
-	//!FINAL STATE OF ALL THE SHARED OBJECT. Once all  |
-	//!AUs executed. Geting this using get_bel_val()   |
-	//!-------------------------------------------------
-	void finalState()
-	{
+	//!------------------------------------------
+	//!Final state of all the shared object.    |
+	//! Once all AUs executed.                  |
+	//!------------------------------------------
+	void finalState() {
 		//coin state
 		for(int sid = 1; sid <= CoinSObj; sid++) {
 			int bal = 0, ts;
 			coin->get_bal(sid, &bal);
 			mCoinState[sid] = bal;
 		}
-
 		for(int id = 1; id <= nVoter; id++) 
 			ballot->state(id, true, mBallotVotState);//for voter state
-
 		for(int id = 1; id <= nProposal; id++) 
 			ballot->state(id, false, mBallotProState);//for Proposal state
-
 		auction->state(&mHBidder, &mHBid, mPendingRet);//Auction state
 	}
 
 	~Miner() { };
 };
+/*********************MINER CODE ENDS*************************/
 
 
+
+
+/*************************VALIDATOR CODE BEGINS****************/
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Class "Validator" CREATE & RUN "1" validator-THREAD          !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 class Validator
 {
-public:
-
+	public:
 	Validator(int contDeployer)
 	{
 		//! initialize the counter to 0.
@@ -287,11 +282,10 @@ public:
 			ballot_v->giveRightToVote(0, voter);
 		}
 		//!-----------------------------------------------------
-		//!!!!!!!!!!    CREATE 1 VALIDATOR THREADS      !!!!!!!!
+		//!!!!!!!!!!    CREATE 1 VALIDATOR THREAD       !!!!!!!!
 		//!-----------------------------------------------------
 		double start = lTimer.timeReq();
-		for(int i = 0; i < nThread; i++)
-			T[i] = thread(concValidator, i, numAUs);
+		for(int i = 0; i < nThread; i++) T[i] = thread(concValidator, i, numAUs);
 		for(auto& th : T) th.join();
 		tTime[1] = lTimer.timeReq() - start;
 	
@@ -302,9 +296,9 @@ public:
 //		auctionV->AuctionEnded( );
 	}
 
-	//!------------------------------------------------------------
-	//! THE FUNCTION TO BE EXECUTED BY ALL THE VALIDATOR THREADS. !
-	//!------------------------------------------------------------
+	//!------------------------------------------------------
+	//! THE FUNCTION TO BE EXECUTED BY A VALIDATOR THREAD.  !
+	//!------------------------------------------------------
 	static void concValidator( int t_ID, int numAUs)
 	{
 		Timer tTimer;
@@ -312,23 +306,20 @@ public:
 		int curInd = currAU++;
 		//! statrt clock to get time taken by this.AU
 		auto start = tTimer._timeStart();
-		while( curInd < numAUs )
-		{
+		while( curInd < numAUs ) {
 			//!get the AU to execute, which is of string type.
 			istringstream ss(listAUs[curInd]);
 			string tmp;
 			ss >> tmp;
 			int AU_ID = stoi(tmp);
 			ss >> tmp;
-			if( tmp.compare("get_bal") == 0 )
-			{
+			if( tmp.compare("get_bal") == 0 ) {
 				ss >> tmp;
 				int s_id = stoi(tmp);
 				int bal  = 0;
 				bool v = coinV->get_bal(s_id, &bal);
 			}
-			if( tmp.compare("send") == 0 )
-			{
+			if( tmp.compare("send") == 0 ) {
 				ss >> tmp;
 				int s_id = stoi(tmp);
 				ss >> tmp;
@@ -337,8 +328,7 @@ public:
 				int amt = stoi(tmp);
 				bool v  = coinV->send(s_id, r_id, amt);
 			}
-			if(tmp.compare("vote") == 0)
-			{
+			if(tmp.compare("vote") == 0) {
 				ss >> tmp;
 				int vID = stoi(tmp);//! voter ID
 				ss >> tmp;
@@ -346,8 +336,7 @@ public:
 				int v = ballot_v->vote(vID, pID);
 				if(v != 1) aCount[0]++;
 			}
-			if(tmp.compare("delegate") == 0)
-			{
+			if(tmp.compare("delegate") == 0) {
 				ss >> tmp;
 				int sID = stoi(tmp);//! Sender ID
 				ss >> tmp;
@@ -355,8 +344,7 @@ public:
 				int v = ballot_v->delegate(sID, rID);
 				if(v != 1) aCount[0]++;
 			}
-			if(tmp.compare("bid") == 0)
-			{
+			if(tmp.compare("bid") == 0) {
 				ss >> tmp;
 				int payable = stoi(tmp);//! payable
 				ss >> tmp;
@@ -366,31 +354,28 @@ public:
 				bool v = auctionV->bid(payable, bID, bAmt);
 				if(v != true) aCount[0]++;
 			}
-			if(tmp.compare("withdraw") == 0)
-			{
+			if(tmp.compare("withdraw") == 0) {
 				ss >> tmp;
 				int bID = stoi(tmp);//! Bidder ID
 
 				bool v = auctionV->withdraw(bID);
 				if(v != true) aCount[0]++;
 			}
-			if(tmp.compare("auction_end") == 0)
-			{
+			if(tmp.compare("auction_end") == 0) {
 				bool v = auctionV->auction_end( );
 				if(v != true) aCount[0]++;
 			}	
 			//! get the current index to execute, and increment it.
 			curInd = currAU++;
 		}
-		vTTime[t_ID] = vTTime[t_ID] + tTimer._timeStop(start);
+		vTTime[t_ID] += tTimer._timeStop(start);
 	}
 
-	//!-------------------------------------------------
-	//! FINAL STATE OF ALL THE SHARED OBJECT. ONCE ALL |
-	//! AUS EXECUTED. GETING THIS USING get_bel.       |
-	//!-------------------------------------------------
-	void finalState()
-	{
+	//!------------------------------------------
+	//! Final state of all the shared object.   |
+	//! Once all AUs executed.                  |
+	//!------------------------------------------
+	void finalState() {
 		//coin state
 		for(int sid = 1; sid <= CoinSObj; sid++) {
 			int bal = 0;
@@ -409,9 +394,13 @@ public:
 
 	~Validator() { };
 };
+/******************VALIDATOR CODE ENDS*****************************/
 
 
 
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+/*!!!!!!!!     State Validation    !!!!!!!!!!*/
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 bool stateVal() {
 	bool flag = false;
 //	cout<<"\n"<<pl<<"Object \tMiner \t\tValidator"<<endl;
@@ -444,21 +433,39 @@ bool stateVal() {
 
 
 
+/**********************MAIN FUN CODE BEGINS************************/
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-/*!!!!!!!!!!!!!!!   main() !!!!!!!!!!!!!!!!!!*/
+/*!!!!!!!!          main()         !!!!!!!!!!*/
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-int main( )
-{
+int main(int argc, char *argv[]) {
 	cout<<pl<<"Serial Miner and Serial Validator\n";
-	cout<<"-----------------------------\n";
+	cout<<"--------------------------------\n";
+
+	if(argc<3) 
+		cout<<"\nPlease Enter Command Line Argument as follows:"
+			<<"\n\t./a.out <num Blocks> <num Validator> <num Iteration>\n"; 
+
+	NumBlock      = atoi(argv[1]);
+	numValidator  = atoi(argv[2]);
+	int nItertion = atoi(argv[3]);
+
+	if(NumBlock < 2) cout<<"\nNumber of Blocks should be >= 2\n";
+	if(numValidator < 1)cout<<"\nNumber of Validators should be >= 1\n";
+	if(nItertion < 1)cout<<"\nNumber of Iterations should be >= 1\n";
+
+	float tMiner  = 0;
+	float tVal    = 0;
+	int tReject   = 0;
+	int tMaxAcc   = 0;
 
 	//! list holds the avg time taken by miner and validator
-	//!  threads for multiple consecutive runs of the algorithm.
-	list<double>mItrT;         
-	list<double>vItrT;
-	int totalRejCont = 0; //number of validator rejected the blocks;
-	int maxAccepted  = 0;
+	//! threads for multiple consecutive runs of the algorithm.
+	list<float>mItrT;         
+	list<float>vItrT;	
 	int totalRun     = NumBlock; //at least 2
+	int maxAccepted  = 0;
+	int totalRejCont = 0; //number of validator rejected the blocks;
+
 	FILEOPR file_opr;
 	
 	//! read from input file::
@@ -504,34 +511,35 @@ int main( )
 	mPendingRet     = new int [nBidder+1];
 	vPendingRet     = new int [nBidder+1];
 
-	//!------------------------------------------------------------------
-	//! Num of threads should be 1 for serial so we are fixing it to 1, !
-	//! Whatever be # of threads in inputfile, it will be always one.   !
-	//!------------------------------------------------------------------
-	nThread = 1;
 
-	for(int numItr = 0; numItr < totalRun; numItr++)
+	for(int itr = 0; itr < nItertion; itr++)
 	{
-		 //! generates AUs (i.e. trans to be executed by miner & validator).
-		file_opr.genAUs(input, CFCount, BFCount, AFConut, listAUs);
+		//!------------------------------------------------------------------
+		//! Num of threads should be 1 for serial so we are fixing it to 1, !
+		//! Whatever be # of threads in inputfile, it will be always one.   !
+		//!------------------------------------------------------------------
+		nThread = 1;
 
-		Timer mTimer;
-		mTimer.start();
-
-		//MINER
-		Miner *miner = new Miner(0);
-		miner ->mainMiner();
-
-		//VALIDATOR
-		if(MValidation == true)
+		for(int nBlock = 0; nBlock < NumBlock; nBlock++)
 		{
+			//! generates AUs (i.e. trans to be executed by miner & validator).
+			file_opr.genAUs(input, CFCount, BFCount, AFConut, listAUs);
+
+			Timer mTimer;
+			mTimer.start();
+
+			//MINER
+			Miner *miner = new Miner(0);
+			miner ->mainMiner();
+
+			//VALIDATOR
 			int acceptCount = 0, rejectCount = 0;
 			for(int nval = 0; nval < numValidator; nval++)
 			{
 				for(int p = 0; p < nProposal; p++)vBallotProState[p]= 0;
 				for(int v = 0; v < nVoter; v++)   vBallotVotState[v]= 0;
 				for(int c = 0; c < CoinSObj; c++) vCoinState[c]     = 0;
-				
+			
 				Validator *validator = new Validator(0);
 				validator ->mainValidator();
 				//State Validation
@@ -539,57 +547,53 @@ int main( )
 				if(flag == true) rejectCount++;
 				else acceptCount++;
 			}
-			if(numItr > 0) {
+			if(nBlock > 0) {
 				totalRejCont += rejectCount;
 				if(maxAccepted < acceptCount ) maxAccepted = acceptCount;
 			}
-		}
-		else {
-			Validator *validator = new Validator(0);
-			validator ->mainValidator();
 
-			//State Validation
-			bool flag = stateVal();
-			if(flag == true) cout<<"\nBlock Rejected by Validator";
-		}
-		mTimer.stop();
+			mTimer.stop();
 
-		//total valid AUs among List-AUs executed by Miner & varified by Validator.
-		int vAUs = numAUs;
-		if(numItr > 0)
+			//total valid AUs among List-AUs executed by Miner & varified by Validator.
+			int vAUs = numAUs;
+			if(nBlock > 0)
 			file_opr.writeOpt(nThread, numAUs, tTime, mTTime,
 			                  vTTime, aCount, vAUs, mItrT, vItrT);
 
-//		for(int pid = 0; pid < nProposal; pid++) mBallotProState[pid] = 0;
-//		for(int vid = 0; vid < nVoter; vid++)    mBallotVotState[vid] = 0;
-//		for(int cid = 0; cid < CoinSObj; cid++)  mCoinState[cid]      = 0;
-		listAUs.clear();
-		delete miner;
-		miner = NULL;
+			listAUs.clear();
+			delete miner;
+			miner = NULL;
+		}
+		// to get total avg miner and validator
+		// time after number of totalRun runs.
+		float tAvgMinerT = 0;
+		float tAvgValidT = 0;
+		auto mit = mItrT.begin();
+		auto vit = vItrT.begin();
+		for(int j = 1; j < NumBlock; j++) {
+			tAvgMinerT = tAvgMinerT + *mit;
+			tAvgValidT = tAvgValidT + *vit;
+			mit++;
+			vit++;
+		}
+		tAvgMinerT = tAvgMinerT/(NumBlock-1);
+		tAvgValidT = tAvgValidT/(NumBlock-1);
+
+		tMiner  += tAvgMinerT;
+		tVal    += tAvgValidT;
+		tReject += totalRejCont/(NumBlock-1);
+		
+		if(tMaxAcc < maxAccepted) tMaxAcc = maxAccepted;
 	}
-	// to get total avg miner and validator
-	// time after number of totalRun runs.
-	double tAvgMinerT = 0;
-	double tAvgValidT = 0;
-	auto mit = mItrT.begin();
-	auto vit = vItrT.begin();
-	for(int j = 1; j < totalRun; j++)
-	{
-		tAvgMinerT = tAvgMinerT + *mit;
-		tAvgValidT = tAvgValidT + *vit;
-		mit++;
-		vit++;
-	}
-	tAvgMinerT = tAvgMinerT/(totalRun-1);
-	tAvgValidT = tAvgValidT/(totalRun-1);
-	cout<<"Avg Miner     Time in microseconds = "<<tAvgMinerT;
-	cout<<"\nAvg Validator Time in microseconds = "<<tAvgValidT;
+	cout<<"Avg Miner     Time in microseconds = "<<tMiner/nItertion;;
+	cout<<"\nAvg Validator Time in microseconds = "<<tVal/nItertion;;
 	cout<<"\n--------------------------------";
 	cout<<"\nAvg Validator Accepted a   Block   = "
-		<<(numValidator-(totalRejCont/(totalRun-1)));
+		<<(numValidator-(tReject/nItertion));
 	cout<<"\nAvg Validator Rejcted  a   Block   = "
-		<<totalRejCont/(totalRun-1);
-	cout<<"\nMax Validator Accepted any Block   = "<<maxAccepted;
+		<<tReject/nItertion;
+	cout<<"\nMax Validator Accepted any Block   = "<<tMaxAcc;
 	cout<<"\n"<<endl;
-return 0;
+
+	return 0;
 }

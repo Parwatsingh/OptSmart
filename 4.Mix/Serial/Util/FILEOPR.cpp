@@ -80,42 +80,69 @@ void FILEOPR::getInp( int input[] )
 !!! Time taken by algorithm  !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 void FILEOPR::writeOpt( int n, int K, 
-						double total_time[],
-						float_t mTTime[],
-						float_t vTTime[],
-						int aCount[],
-						int validAUs,
-						list<double>&mIT,
-						list<double>&vIT)
+                        double total_time[],
+                        float_t mTTime[],
+                        float_t vTTime[],
+                        int aCount[],
+                        int validAUs,
+                       list<float>&mIT,
+                       list<float>&vIT)
 {
-	float_t minTime = 0;//total time miner thread
-	float_t valTime = 0;//total time validator thred
+	ofstream out;
+	out.open("inp-output/Time.csv");
 	
-	for(int i = 0; i < n; i++) minTime = minTime + mTTime[i];
+	float_t t_Time[2];
+	t_Time[0] = 0;//total time miner thread
+	t_Time[1] = 0;//total time validator thred
+	
+	//cout<<"=============================";
+	//cout<<"\nTime Taken By Miner Threads:\n";
+	out <<"\nTime Taken By Miner Threads:\n";
+	//cout<<"=============================\n";
+	for(int i = 0; i < n; i++) 
+	{
+	//	cout<<"THREAD "<< i << "\t =\t "<< mTTime[i] <<" \t microseconds\n";
+		out <<"THREAD "<< i << "\t =\t "<< mTTime[i] <<" \t microseconds\n";
+		t_Time[0] = t_Time[0] + mTTime[i];
+	}
 
-	for(int i = 0; i < n; i++) valTime = valTime + vTTime[i];
+	//cout<<"\n\n================================";
+	//cout<<"\nTime Taken By Validator Threads:\n";
+	out <<"\nTime Taken By Validator Threads:\n";
+	//cout<<"================================\n";
+	for(int i = 0; i < n; i++) 
+	{
+	//	cout<<"THREAD "<< i << "\t =\t "<< vTTime[i] <<" \t microseconds\n";
+		out <<"THREAD \t"<< i << "\t =\t "<< vTTime[i] <<" \t microseconds\n";
+		t_Time[1] = t_Time[1] + vTTime[i];
+	}
 
 	int total_Abort = 0;	
 	for(int i = 0; i < n; i++)
 	{
 		total_Abort = total_Abort + aCount[i];
-	}
-
+	}	
+//	cout<<" Total Aborts = "<<total_Abort;
+	out <<" # Total Aborts \t = \t"<<total_Abort<<"\n\n";
+	
 	//Average Time Taken by one Miner Thread = Total Time/# Threads
-//	cout<<"\n    Avg Miner = "<<minTime/n<<" microseconds\n";
-	mIT.push_back(minTime/n);
+	out <<"\n\nAverage Time Taken by a Miner     Thread      \t  = \t "
+	    <<t_Time[0]/n << " \t microseconds\n";
+//	cout<<"\n    Avg Miner = "<<t_Time[0]/n<<" \t microseconds\n";
+	mIT.push_back(t_Time[0]/n);
 
 	//Average Time Taken by one Validator Thread = Total Time/# Threads
-//	cout<<"Avg Validator = "<<valTime/n<<" microseconds\n";
-	vIT.push_back(valTime/n);
-	
-	//Total Avg Time Taken by Both Algorithm Threads
-//	cout<<"Total (M + V) = "<<(minTime/n + valTime/n)<<" microseconds\n";
+	out <<"Average Time Taken by a Validator Thread      \t  = \t "
+	    <<t_Time[1]/n << " \t microseconds\n";
+//	cout<<"Avg Validator = "<<t_Time[1]/n<<" \t microseconds\n";
+	vIT.push_back(t_Time[1]/n);
+
+	out.close( );
 	return;
 }
+
 	
-	
-	
+
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! genAUs() generate and store the Atomic Unites     !!!
 !!! (transactions to be executed by miner/validator)  !!!
@@ -123,7 +150,11 @@ void FILEOPR::writeOpt( int n, int K,
 !!! smart contract, numAUs: number of AUs to be       !!!
 !!! requested by client to execute                    !!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-void FILEOPR::genAUs(int input[], int nCF, int nBF, int nAF, vector<string>& ListAUs)
+void FILEOPR::genAUs(int input[],
+                     int nCF,
+                     int nBF,
+                     int nAF,
+                     vector<string>& ListAUs)
 {
 	std::ifstream in( "inp-output/listAUs.txt" );
 	for( std::string trns; getline( in, trns ); )
