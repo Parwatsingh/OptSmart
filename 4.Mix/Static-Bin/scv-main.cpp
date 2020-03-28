@@ -177,6 +177,7 @@ class Miner
 		double s = mTimer.timeReq();
 		for(int i = 0; i < nThread; i++)
 			T[i] = thread(concMiner, i, concBin.size());
+		shoot();
 		for(auto& th : T) th.join();
 		tTime[0] = mTimer.timeReq() - s;
 
@@ -184,7 +185,7 @@ class Miner
 		//!------------------------------------------
 		//!!!!!!!!!   Sequential Phase     !!!!!!!!!!
 		//!------------------------------------------
-		seqTime[1] = 0;
+//		seqTime[1] = 0;
 		Timer SeqTimer;
 		start = SeqTimer._timeStart();
 		seqBinExe();
@@ -300,8 +301,8 @@ class Miner
 	//!--------------------------------------------------------
 	static void concMiner( int t_ID, int numAUs)
 	{
-		shoot();
-
+		//barrier to synchronise all threads for a coherent launch
+		wait_for_launch();
 		Timer thTimer;
 
 		//! flag is used to add valid AUs in Graph.
@@ -521,10 +522,10 @@ class Validator
 	public:
 	Validator() {
 		//! int the execution counter used by validator threads.
-		eAUCount = 0;
-		
+		eAUCount = 0;		
 		//! array index location => thread id.
 		vTTime   = new float_t[nThread];
+		for(int i = 0; i < nThread; i++) vTTime[i] = 0;
 	};
 
 	//!----------------------------------------

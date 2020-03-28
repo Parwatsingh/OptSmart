@@ -170,6 +170,7 @@ class Miner
 		double s = mTimer.timeReq();
 		for(int i = 0; i < nThread; i++)
 			T[i] = thread(concMiner, i, numAUs);
+		shoot();
 		for(auto& th : T) th.join();
 		tTime[0] = mTimer.timeReq() - s;
 
@@ -180,11 +181,11 @@ class Miner
 //		coin->allUnlock();
 //		ballot->allUnlock();
 //		auction->allUnlock();
-		seqTime[0] = 0;
+//		seqTime[0] = 0;
 		Timer SeqTimer;
 		auto start = SeqTimer._timeStart();
 		seqBinExe();
-		seqTime[0] = SeqTimer._timeStop( start );
+		seqTime[0] += SeqTimer._timeStop( start );
 //		coin->allUnlock();
 //		ballot->allUnlock();
 //		auction->allUnlock();
@@ -198,6 +199,8 @@ class Miner
 	//!--------------------------------------------------------
 	static void concMiner( int t_ID, int numAUs)
 	{
+		//barrier to synchronise all threads for a coherent launch
+		wait_for_launch();
 		Timer thTimer;
 		//! get the current index, and increment it.
 		int curInd = currAU++;
@@ -489,6 +492,7 @@ class Validator
 		eAUCount = 0;
 		//! array index location => thread id.
 		vTTime   = new float_t[nThread];
+		for(int i = 0; i < nThread; i++) vTTime[i] = 0;
 	};
 
 	//!----------------------------------------
@@ -497,7 +501,7 @@ class Validator
 	//!----------------------------------------
 	void mainValidator()
 	{
-		for(int i = 0; i < nThread; i++) vTTime[i] = 0;
+//		for(int i = 0; i < nThread; i++) vTTime[i] = 0;
 		eAUCount = 0;
 
 		Timer vTimer;
@@ -538,11 +542,11 @@ class Validator
 		//!------------------------------------------
 		//!!!!!!!!!   Sequential Phase     !!!!!!!!!!
 		//!------------------------------------------
-		seqTime[1] = 0;
+//		seqTime[1] = 0;
 		Timer SeqTimer;
 		auto start = SeqTimer._timeStart();
 		seqBinExe();
-		seqTime[1] = SeqTimer._timeStop( start );
+		seqTime[1] += SeqTimer._timeStop( start );
 		//! print the final state of the shared objects by validator.
 		finalState();
 	}
