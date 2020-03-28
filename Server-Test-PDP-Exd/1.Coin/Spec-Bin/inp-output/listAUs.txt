@@ -1,0 +1,200 @@
+1 send 498 499 0
+2 send 498 500 0
+3 send 181 372 175
+4 get_bal 134
+5 get_bal 140
+6 send 297 251 337
+7 send 257 454 65
+8 get_bal 167
+9 get_bal 3
+10 send 323 263 189
+11 get_bal 188
+12 send 124 218 524
+13 get_bal 399
+14 get_bal 14
+15 send 422 66 135
+16 send 440 134 831
+17 get_bal 357
+18 send 245 198 127
+19 get_bal 432
+20 send 358 473 492
+21 get_bal 432
+22 get_bal 278
+23 send 351 166 737
+24 send 311 95 586
+25 get_bal 61
+26 get_bal 55
+27 get_bal 74
+28 get_bal 288
+29 get_bal 399
+30 get_bal 114
+31 send 432 450 816
+32 get_bal 420
+33 get_bal 441
+34 get_bal 459
+35 send 158 100 764
+36 get_bal 31
+37 send 479 416 259
+38 send 148 279 997
+39 get_bal 283
+40 send 164 458 750
+41 send 221 62 881
+42 send 235 197 625
+43 get_bal 378
+44 get_bal 37
+45 get_bal 178
+46 get_bal 340
+47 get_bal 274
+48 get_bal 382
+49 get_bal 427
+50 get_bal 136
+51 get_bal 280
+52 get_bal 449
+53 get_bal 272
+54 get_bal 372
+55 get_bal 270
+56 get_bal 52
+57 get_bal 147
+58 get_bal 81
+59 get_bal 9
+60 get_bal 446
+61 get_bal 290
+62 get_bal 329
+63 get_bal 282
+64 get_bal 487
+65 get_bal 348
+66 get_bal 448
+67 get_bal 376
+68 get_bal 385
+69 get_bal 251
+70 get_bal 334
+71 get_bal 491
+72 get_bal 245
+73 get_bal 301
+74 get_bal 244
+75 get_bal 381
+76 get_bal 166
+77 get_bal 378
+78 get_bal 323
+79 get_bal 425
+80 get_bal 414
+81 get_bal 380
+82 get_bal 312
+83 get_bal 329
+84 get_bal 245
+85 get_bal 205
+86 get_bal 148
+87 get_bal 259
+88 get_bal 10
+89 get_bal 424
+90 get_bal 37
+91 get_bal 419
+92 get_bal 49
+93 get_bal 377
+94 get_bal 345
+95 get_bal 487
+96 get_bal 383
+97 get_bal 93
+98 get_bal 317
+99 get_bal 254
+100 get_bal 387
+101 get_bal 489
+102 get_bal 308
+103 get_bal 312
+104 get_bal 363
+105 get_bal 366
+106 get_bal 81
+107 get_bal 380
+108 get_bal 335
+109 get_bal 326
+110 get_bal 164
+111 get_bal 115
+112 get_bal 53
+113 get_bal 393
+114 get_bal 239
+115 get_bal 159
+116 get_bal 457
+117 get_bal 482
+118 get_bal 251
+119 get_bal 190
+120 get_bal 165
+121 get_bal 377
+122 get_bal 442
+123 get_bal 87
+124 get_bal 112
+125 get_bal 60
+126 get_bal 183
+127 get_bal 457
+128 get_bal 139
+129 get_bal 7
+130 get_bal 436
+131 get_bal 258
+132 get_bal 63
+133 get_bal 320
+134 get_bal 51
+135 get_bal 4
+136 get_bal 88
+137 get_bal 456
+138 get_bal 418
+139 get_bal 27
+140 get_bal 338
+141 get_bal 111
+142 get_bal 48
+143 get_bal 290
+144 get_bal 147
+145 get_bal 235
+146 get_bal 146
+147 get_bal 23
+148 get_bal 308
+149 get_bal 176
+150 get_bal 390
+151 get_bal 213
+152 get_bal 78
+153 get_bal 56
+154 get_bal 482
+155 get_bal 349
+156 get_bal 180
+157 get_bal 111
+158 get_bal 477
+159 get_bal 217
+160 get_bal 121
+161 get_bal 345
+162 get_bal 176
+163 get_bal 315
+164 get_bal 296
+165 get_bal 304
+166 get_bal 187
+167 get_bal 195
+168 get_bal 252
+169 get_bal 15
+170 get_bal 486
+171 get_bal 458
+172 get_bal 450
+173 get_bal 476
+174 get_bal 370
+175 get_bal 493
+176 get_bal 191
+177 get_bal 93
+178 get_bal 69
+179 get_bal 199
+180 get_bal 69
+181 get_bal 255
+182 get_bal 358
+183 get_bal 348
+184 get_bal 200
+185 get_bal 60
+186 get_bal 255
+187 get_bal 326
+188 get_bal 119
+189 get_bal 32
+190 get_bal 97
+191 get_bal 42
+192 get_bal 363
+193 get_bal 5
+194 get_bal 364
+195 get_bal 246
+196 get_bal 483
+197 get_bal 324
+198 get_bal 4
+199 get_bal 268
+200 get_bal 321
