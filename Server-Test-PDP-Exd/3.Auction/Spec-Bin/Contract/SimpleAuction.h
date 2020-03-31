@@ -34,7 +34,7 @@ class SimpleAuction
 		list<PendReturn>pendingReturns;
 		list<PendReturn>pendingReturnsM;
 
-		std::shared_mutex tLock[5000];
+		std::shared_mutex tLock[10000];
 		// Set to true at the end, disallows any change.
 		std::atomic<bool> ended;
 		SimpleAuction( int _biddingTime, int _beneficiary, int numBidder) {

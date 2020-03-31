@@ -39,7 +39,7 @@ class SimpleAuction
 		list<PendReturn>pendingReturns;
 		list<PendReturn>pendingReturnsM;
 
-		std::shared_mutex tLock[501];
+		std::shared_mutex tLock[5001];
 		// Set to true at the end, disallows any change.
 		std::atomic<bool> ended;
 		SimpleAuction( int _biddingTime, int _beneficiary, int numBidder) {
@@ -95,7 +95,7 @@ class Coin
 		};
 		list<accNode>listAccount;
 		list<accNode>listAccountMiner;
-		std::shared_mutex tLock[1001];
+		std::shared_mutex tLock[3001];
 		std::atomic<int> minter; //! contract creator
 		std::atomic<int> nAccount;
 
@@ -157,8 +157,8 @@ class Ballot
 		list<Proposal>proposalsM;
 
 		std::atomic<int> chairperson;
-		std::shared_mutex ptLock[501];  //Proposal Try Locks
-		std::shared_mutex vtLock[1001]; //Voters Try Locks
+		std::shared_mutex ptLock[5001];  //Proposal Try Locks
+		std::shared_mutex vtLock[10001]; //Voters Try Locks
 
 		//! constructor:: create a new ballot to choose one of `proposalNames`.
 		Ballot(string proposalNames[], int sender, int numVoter, int nPropsal)

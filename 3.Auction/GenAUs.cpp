@@ -75,14 +75,14 @@ void genAUs(int numAUs, int nBidder, int nFunC, int nThreads)
 	fstream f_smpBto, f_smpMvto, f_smpOstm, f_smpMvos, f_serial;
 	fstream f_smpSta, f_smpStm,  f_smpTry,  file_log;
 
-	f_smpBto.open ("BTO-STM/inp-output/inp-params.txt",    ios::out);
-	f_smpMvto.open("MVTO/inp-output/inp-params.txt",       ios::out);
-	f_smpOstm.open("OSTM/inp-output/inp-params.txt",       ios::out);
-	f_smpMvos.open("MVOSTM/inp-output/inp-params.txt",     ios::out);
-	f_serial.open ("Serial/inp-output/inp-params.txt",     ios::out);
-	f_smpSta.open ("Static-Bin/inp-output/inp-params.txt", ios::out);
-	f_smpStm.open ("STM-Bin/inp-output/inp-params.txt",    ios::out);
-	f_smpTry.open ("Spec-Bin/inp-output/inp-params.txt",   ios::out);
+	f_smpBto.open ("BTO-STM/inp-output/listAUs.txt",    ios::out);
+	f_smpMvto.open("MVTO/inp-output/listAUs.txt",       ios::out);
+	f_smpOstm.open("OSTM/inp-output/listAUs.txt",       ios::out);
+	f_smpMvos.open("MVOSTM/inp-output/listAUs.txt",     ios::out);
+	f_serial.open ("Serial/inp-output/listAUs.txt",     ios::out);
+	f_smpSta.open ("Static-Bin/inp-output/listAUs.txt", ios::out);
+	f_smpStm.open ("STM-Bin/inp-output/listAUs.txt",    ios::out);
+	f_smpTry.open ("Spec-Bin/inp-output/listAUs.txt",   ios::out);
 
 	int bidC = ceil((numAUs * (bidPer)) /100);
 	int withdrawC = ceil((numAUs * (withdrawPer)) /100);

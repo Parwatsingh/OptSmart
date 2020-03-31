@@ -16,7 +16,7 @@
 #define BFCount 5         //# methods in ballot contract.
 
 #define maxBidrObj 5000   //maximum simple auction contract \bidder\ shared object.
-#define maxbEndT 600      //maximum simple auction contract \bidding time out\ duration.
+#define maxbEndT 6000     //maximum simple auction contract \bidding time out\ duration.
 #define AFConut 6         //# methods in simple auction contract.
 #define pl "===================================================\n"
 #define InitBalance 1000

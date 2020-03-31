@@ -43,8 +43,8 @@ class Ballot
 		list<Proposal>proposalsM;
 
 		std::atomic<int> chairperson;
-		std::shared_mutex ptLock[1001];  //Proposal Try Locks
-		std::shared_mutex vtLock[40001]; //Voters Try Locks
+		std::shared_mutex ptLock[5001];  //Proposal Try Locks
+		std::shared_mutex vtLock[10001]; //Voters Try Locks
 
 		//! constructor:: create a new ballot to choose one of `proposalNames`.
 		Ballot(string proposalNames[], int sender, int numVoter, int nPropsal)
