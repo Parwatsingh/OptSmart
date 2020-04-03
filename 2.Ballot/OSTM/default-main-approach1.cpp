@@ -195,10 +195,7 @@ class Miner
 					v = ballot->vote_m(vID, pID, &t_stamp, conf_list);					
 					if(v == -1) {
 						//! invalid AU
-						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-						remove(concBin.begin(), concBin.end(), AU_ID);
-						cb.unlock();
+						concBin[AU_ID-1] = -1;
 						flag = false;
 						break;                                    
 					}
@@ -216,10 +213,7 @@ class Miner
 					v = ballot->delegate_m(sID, rID, &t_stamp, conf_list);
 					if(v == -1) {
 						//! invalid AU:
-						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-						remove(concBin.begin(), concBin.end(), AU_ID);
-						cb.unlock();
+						concBin[AU_ID-1] = -1;
 						flag = false;
 						break;                                    
 					}
@@ -260,10 +254,7 @@ class Miner
 				}
 				else
 				{
-					cb.lock();
-//					concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-					remove(concBin.begin(), concBin.end(), AU_ID);
-					cb.unlock();
+					concBin[AU_ID-1] = -1;
 					for(auto it = conf_list.begin(); it != conf_list.end(); it++) {
 						int i = 0;
 						//! get conf AU_ID in map table
@@ -283,10 +274,7 @@ class Miner
 						if(cTstamp > t_stamp) //! edge from AU_ID to cAUID.
 							cGraph->add_edge(AU_ID, cAUID, t_stamp, cTstamp);
 
-						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), cAUID), concBin.end());
-						remove(concBin.begin(), concBin.end(), cAUID);
-						cb.unlock();
+						concBin[cAUID-1] = -1;
 					}
 				}
 				gTtime[t_ID] += thTimer._timeStop(gstart);
@@ -1032,6 +1020,8 @@ int main(int argc, char *argv[])
 			auto start = ccbTimer._timeStart();
 			auto ip = unique(concBin.begin(), concBin.end());
 			concBin.resize(std::distance(concBin.begin(), ip));
+			concBin.erase(remove(concBin.begin(), concBin.end(), -1), concBin.end());
+			remove(concBin.begin(), concBin.end(), -1);
 			cbcTime += ccbTimer._timeStop( start );
 
 			//Function to add malicious trans and final state by Miner

@@ -164,10 +164,6 @@ class Miner
 					aCount[0]++;
 					v = auction->bid_m(payable, bID, bAmt, &t_stamp, conf_list);
 					if(v == -1) {
-//						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-//						remove(concBin.begin(), concBin.end(), AU_ID);
-//						cb.unlock();
 						concBin[AU_ID-1] = -1;
 						flag = false;//! invalid AU.
 						break;                                    
@@ -183,10 +179,6 @@ class Miner
 					aCount[0]++;
 					v = auction->withdraw_m(bID, &t_stamp, conf_list);
 					if(v == -1) {
-//						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-//						remove(concBin.begin(), concBin.end(), AU_ID);
-//						cb.unlock();
 						concBin[AU_ID-1] = -1;
 						flag = false;//! invalid AU.
 						break;                                    
@@ -199,10 +191,6 @@ class Miner
 					aCount[0]++;
 					v = auction->auction_end_m(&t_stamp, conf_list);
 					if(v == -1) {
-//						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-//						remove(concBin.begin(), concBin.end(), AU_ID);
-//						cb.unlock();
 						concBin[AU_ID-1] = -1;
 						flag = false;//! invalid AU.
 						break;                                    

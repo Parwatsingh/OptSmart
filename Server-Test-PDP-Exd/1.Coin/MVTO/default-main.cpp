@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #define MAX_THREADS 128
-#define M_SharedObj 5000
+#define M_SharedObj 6000
 #define FUN_IN_CONT 3
 #define pl "===================================================\n"
 #define InitBalance 1000
@@ -837,6 +837,7 @@ int main(int argc, char *argv[])
 	vState = new int [SObj];
 	fvState= new int [SObj];
 
+	float valTime, fvalTime;
 	for(int itr = 0; itr < nItertion; itr++)
 	{
 		totalRejCont  = 0;
@@ -845,9 +846,14 @@ int main(int argc, char *argv[])
 		fmaxAccepted  = 0;
 		totalDepInG   = 0;
 		tInDegAUs     = 0;
+		valTime       = 0;
+		fvalTime      = 0;
 
+		float Blockvalt, Blockfvalt;
 		for(int nBlock = 0; nBlock < NumBlock; nBlock++)
 		{
+			Blockvalt  = 0;
+			Blockfvalt = 0;
 			//! generates AUs (i.e. trans to be executed by miner & validator).
 			file_opr.genAUs(numAUs, SObj, FUN_IN_CONT, listAUs);
 			//! index+1 represents respective AU id, and
@@ -873,19 +879,21 @@ int main(int argc, char *argv[])
 			//VALIDATOR
 			if(MValidation == true)
 			{
+				float valt       = 0, fvalt        = 0;
 				int acceptCount  = 0, rejectCount  = 0;
 				int facceptCount = 0, frejectCount = 0;
 
 				for(int nval = 0; nval < numValidator; nval++)
 				{
+					valt  = 0, fvalt = 0;
 					Validator *validator      = new Validator();
 					ForkValidator *fvalidator = new ForkValidator();
 					nValBG = NULL;
 					nValBG = new Graph;
-					cGraph->copy_graph(nValBG);
+					cGraph->copy_BG(nValBG);
 					validator ->mainValidator();
 
-					cGraph->copy_graph(nValBG);
+					cGraph->copy_BG(nValBG);
 					fvalidator->mainValidator();
 
 
@@ -898,6 +906,21 @@ int main(int argc, char *argv[])
 					flag = stateVal(true);
 					if(flag == true) frejectCount++;
 					else facceptCount++;
+
+					int counterv = 0, counterfv = 0;
+					for( int x = 0; x < nThread; x++ ){
+						if(vTTime[x] != 0) {
+							valt += vTTime[x];
+							counterv++;
+						}
+						if(fvTTime[x] != 0) {
+							fvalt += fvTTime[x];
+							counterfv++;
+						}
+					}
+
+					if(nBlock > 0) Blockvalt  += valt/counterv;
+					if(nBlock > 0) Blockfvalt += fvalt/counterfv;
 				}
 				if(nBlock > 0 && malMiner == true) {
 					totalRejCont += rejectCount;
@@ -914,7 +937,7 @@ int main(int argc, char *argv[])
 			else {
 				Validator *validator = new Validator();
 				nValBG = new Graph;
-				cGraph->copy_graph(nValBG);
+				cGraph->copy_BG(nValBG);
 				validator ->mainValidator();
 				//State Validation
 				bool flag = stateVal(false);
@@ -923,8 +946,6 @@ int main(int argc, char *argv[])
 			int abortCnt = 0;
 			for( int iii = 0; iii < nThread; iii++ ) {
 				abortCnt = abortCnt + aCount[iii];
-				vTTime[iii]  = vTTime[iii] / numValidator;
-				fvTTime[iii] = fvTTime[iii] / numValidator;
 			}
 	//		if(nBlock > 0)cout<<"\nNumber of STM Transaction Aborted "<<abortCnt;
 
@@ -948,6 +969,9 @@ int main(int argc, char *argv[])
 			miner = NULL;
 			delete cGraph;
 			cGraph = NULL;
+
+			valTime  += Blockvalt/numValidator;
+			fvalTime += Blockfvalt/numValidator;
 		}
 
 		//! to get total avg miner and validator
@@ -971,13 +995,9 @@ int main(int argc, char *argv[])
 			vit++;
 			fvt++;
 		}
-		tAvgMinerT = tAvgMinerT/(NumBlock-1);
-		tAvgValidT = tAvgValidT/(NumBlock-1);
-		tAvgfValidT= tAvgfValidT/(NumBlock-1);
-
-		tMiner   += tAvgMinerT;
-		tVal     += tAvgValidT;
-		ftVal    += tAvgfValidT;
+		tMiner   += tAvgMinerT/(NumBlock-1);
+		tVal     += valTime/(NumBlock-1);
+		ftVal    += fvalTime/(NumBlock-1);
 		tReject  += totalRejCont /(NumBlock-1);
 		ftReject += ftotalRejCont/(NumBlock-1);
 		tDepInG  += totalDepInG  /(NumBlock-1);
@@ -993,20 +1013,20 @@ int main(int argc, char *argv[])
 	cout<<"\nAvg Dec  Validator Time in microseconds  = "<<tVal/nItertion;
 	cout<<"\nAvg Fork Validator Time in microseconds  = "<<ftVal/nItertion;
 	cout<<"\n-----------------------------\n";
-	cout<<"Avg Dependencies in Graph       = "<<tDepInG/nItertion;
-	cout<<"\nAvg AUs with non-zero In-degree = "<<tInDegAUs/nItertion;
+	cout<<"Avg Dependencies in Graph                = "<<tDepInG/nItertion;
+	cout<<"\nAvg Number of BG Vertices                = "<<tInDegAUs/nItertion;
 	cout<<"\n-----------------------------\n";
-	cout<<"Avg Dec  Validator Accepted a   Block = "
+	cout<<"Avg Dec  Validator Accepted a   Block    = "
 		<<(numValidator-(tReject/nItertion));
-	cout<<"\nAvg Dec  Validator Rejcted  a   Block = "
+	cout<<"\nAvg Dec  Validator Rejcted  a   Block    = "
 		<<tReject/nItertion;
-	cout<<"\nMax Dec  Validator Accepted any Block = "<<tMaxAcc;
+	cout<<"\nMax Dec  Validator Accepted any Block    = "<<tMaxAcc;
 	cout<<"\n-----------------------------\n";
-	cout<<"Avg Fork Validator Accepted a   Block = "
+	cout<<"Avg Fork Validator Accepted a   Block    = "
 		<<(numValidator-(ftReject/nItertion));
-	cout<<"\nAvg Fork Validator Rejcted  a   Block = "
+	cout<<"\nAvg Fork Validator Rejcted  a   Block    = "
 		<<ftReject/nItertion;
-	cout<<"\nMax Fork Validator Accepted any Block = "<<ftMaxAcc;
+	cout<<"\nMax Fork Validator Accepted any Block    = "<<ftMaxAcc;
 	cout<<"\n"<<endl;
 
 	delete mTTime;
@@ -1016,4 +1036,3 @@ int main(int argc, char *argv[])
 	return 0;
 }
 /*************************MAIN FUN CODE ENDS***********************************/
-

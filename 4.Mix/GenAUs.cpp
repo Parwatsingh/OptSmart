@@ -561,7 +561,6 @@ int main(int argc, char *argv[])
 	f_serial  << input << endl;
 	f_smpSta  << input << endl; f_smpStm  << input << endl;
 	f_smpTry  << input << endl;
-	f_scvTry  << input << endl;
 	file_log  << input << endl;
 
 	// Reding from file

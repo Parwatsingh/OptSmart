@@ -16,7 +16,7 @@
 #define BFCount 5         //# methods in ballot contract.
 
 #define maxBidrObj 5000   //maximum simple auction contract \bidder\ shared object.
-#define maxbEndT 600      //maximum simple auction contract \bidding time out\ duration.
+#define maxbEndT 6000     //maximum simple auction contract \bidding time out\ duration.
 #define AFConut 6         //# methods in simple auction contract.
 #define pl "===================================================\n"
 #define InitBalance 1000
@@ -242,10 +242,7 @@ class Miner
 				while(v != 1 ) {
 					if(v == -1) {
 						//! invalid AU:sender does't have sufficent bal to send.
-						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-						remove(concBin.begin(), concBin.end(), AU_ID);
-						cb.unlock();
+						concBin[AU_ID-1] = -1;
 						flag = false;
 						break;                                    
 					}
@@ -262,10 +259,7 @@ class Miner
 				while( v != 1 ) {
 					if(v == -1) {
 						//! invalid AU
-						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-						remove(concBin.begin(), concBin.end(), AU_ID);
-						cb.unlock();
+						concBin[AU_ID-1] = -1;
 						flag = false;
 						break;                                    
 					}
@@ -282,10 +276,7 @@ class Miner
 				while( v != 1 ) {
 					if(v == -1) {
 						//! invalid AU:
-						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-						remove(concBin.begin(), concBin.end(), AU_ID);
-						cb.unlock();
+						concBin[AU_ID-1] = -1;
 						flag = false;
 						break;                                    
 					}
@@ -304,10 +295,7 @@ class Miner
 				while(v != 1) {
 					if(v == -1) {
 						flag = false;//! invalid AU.
-						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-						remove(concBin.begin(), concBin.end(), AU_ID);
-						cb.unlock();
+						concBin[AU_ID-1] = -1;
 						break;                                    
 					}
 					aCount[0]++;
@@ -321,10 +309,7 @@ class Miner
 				while(v != 1) {
 					if(v == -1) {
 						flag = false;//! invalid AU.
-						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-						remove(concBin.begin(), concBin.end(), AU_ID);
-						cb.unlock();
+						concBin[AU_ID-1] = -1;
 						break;                                    
 					}
 					aCount[0]++;
@@ -336,10 +321,7 @@ class Miner
 				while(v != 1) {
 					if(v == -1) {
 						flag = false;//! invalid AU.
-						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-						remove(concBin.begin(), concBin.end(), AU_ID);
-						cb.unlock();
+						concBin[AU_ID-1] = -1;
 						break;                                    
 					}
 					aCount[0]++;
@@ -376,10 +358,7 @@ class Miner
 //					cGraph->add_node(AU_ID, t_stamp, &tempRef);
 				}
 				else {
-					cb.lock();
-//					concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-					remove(concBin.begin(), concBin.end(), AU_ID);
-					cb.unlock();
+					concBin[AU_ID-1] = -1;
 					for(auto it = conf_list.begin(); it != conf_list.end(); it++) {
 						int i = 0;
 						//! find the conf_AU_ID in map given conflicting time-stamp.
@@ -399,10 +378,7 @@ class Miner
 						if(cTstamp > t_stamp)
 							cGraph->add_edge(AU_ID, cAUID, t_stamp, cTstamp);
 
-						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), cAUID), concBin.end());
-						remove(concBin.begin(), concBin.end(), cAUID);
-						cb.unlock();
+						concBin[cAUID-1] = -1;
 					}
 				}
 				gTtime[t_ID] += thTimer._timeStop(gstart);
@@ -1391,6 +1367,8 @@ int main(int argc, char *argv[])
 			auto start = ccbTimer._timeStart();
 			auto ip = unique(concBin.begin(), concBin.end());
 			concBin.resize(std::distance(concBin.begin(), ip));
+			concBin.erase(remove(concBin.begin(), concBin.end(), -1), concBin.end());
+			remove(concBin.begin(), concBin.end(), -1);
 			cbcTime += ccbTimer._timeStop( start );
 
 			//Function to add malicious trans and final state by Miner

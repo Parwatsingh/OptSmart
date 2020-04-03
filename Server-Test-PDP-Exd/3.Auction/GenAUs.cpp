@@ -12,8 +12,8 @@
 #include <list>
 
 #define funInContract 6
-#define bidPer 20
-#define withdrawPer 20
+#define bidPer 8
+#define withdrawPer 91
 
 using namespace std;
 

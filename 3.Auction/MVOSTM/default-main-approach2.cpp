@@ -6,8 +6,8 @@
 #include "Util/FILEOPR.cpp"
 
 #define maxThreads 128
-#define maxBObj 5000
-#define maxbEndT 5000 //millseconds
+#define maxBObj 10000
+#define maxbEndT 10000 //millseconds
 #define funInContract 6
 #define pl "===================================================\n"
 #define MValidation true   //! true or false

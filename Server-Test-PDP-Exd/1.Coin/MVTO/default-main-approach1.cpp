@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #define MAX_THREADS 128
-#define M_SharedObj 5000
+#define M_SharedObj 6000
 #define FUN_IN_CONT 3
 #define pl "===================================================\n"
 #define InitBalance 1000

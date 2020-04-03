@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #define MAX_THREADS 128
-#define M_SharedObj 5000
+#define M_SharedObj 6000
 #define FUN_IN_CONT 3
 #define pl "===================================================\n"
 #define InitBalance 1000
@@ -909,7 +909,7 @@ bool stateVal(bool f)
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 int main(int argc, char *argv[])
 {
-	cout<<pl<<"BTO Miner and Concurrent Validator - Approach2\n";
+	cout<<pl<<"BTO Miner and Concurrent Validator - Approach 2\n";
 	cout<<"--------------------------------\n";
 
 	if(argc<3) 

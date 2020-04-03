@@ -4,6 +4,6 @@ if os.path.exists("inp-output/Time.csv"):
 	os.remove("inp-output/Time.csv")
  
 for i in range(1, 11):
-	cmd = ["./serialBallot", "21", "5", "3"]
+	cmd = ["./serialBallot", "11", "5", "2"]
 	subprocess.call(cmd)
 print("\n             +++++++++++++++++++++++++++++++++\n")

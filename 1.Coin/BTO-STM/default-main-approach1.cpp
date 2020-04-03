@@ -182,10 +182,7 @@ class Miner
 						//! invalid AU: sender does't 
 						//! have sufficent balance to send.
 						flag = false;
-//						concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-						cb.lock();
-						remove(concBin.begin(), concBin.end(), AU_ID);
-						cb.unlock();
+						concBin[AU_ID-1] = -1;
 						break;
 					}
 				}
@@ -214,10 +211,7 @@ class Miner
 				}
 				else
 				{
-					cb.lock();
-//					concBin.erase(remove(concBin.begin(), concBin.end(), AU_ID), concBin.end());
-					remove(concBin.begin(), concBin.end(), AU_ID);
-					cb.unlock();
+					concBin[AU_ID-1] = -1;
 					for(auto it = conf_list.begin(); it != conf_list.end(); it++)
 					{
 						int i = 0;
@@ -237,10 +231,7 @@ class Miner
 						if(cTstamp > t_stamp)
 							cGraph->add_edge(AU_ID, cAUID, t_stamp, cTstamp);
 
-						cb.lock();
-//						concBin.erase(remove(concBin.begin(), concBin.end(), cAUID), concBin.end());
-						remove(concBin.begin(), concBin.end(), cAUID);
-						cb.unlock();
+						concBin[cAUID-1] = -1;
 					}
 				}
 			}
@@ -1005,6 +996,8 @@ int main(int argc, char *argv[])
 			auto start = ccbTimer._timeStart();
 			auto ip = unique(concBin.begin(), concBin.end());
 			concBin.resize(std::distance(concBin.begin(), ip));
+			concBin.erase(remove(concBin.begin(), concBin.end(), -1), concBin.end());
+			remove(concBin.begin(), concBin.end(), -1);
 			cbcTime += ccbTimer._timeStop( start );
 
 			if(lemda != 0) bool rv = addMFS(NumOfDoubleSTx);
