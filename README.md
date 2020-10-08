@@ -1,4 +1,4 @@
-# OptSmart (OCTES): An Efficient Framework for Optimistic Concurrent Execution of Smart Contracts
+# OCTES: An Efficient Framework for Optimistic Concurrent Execution of Smart Contracts
   Parwat Singh Anjana, Sweta Kumari, Sathya Peri, Sachin Rathor, Archit Somani
 
   Appeared in the 27th Euromicro International Conference on Parallel, Distributed and Network-Based Processing (PDP), 2019 https://www.pdp2019.eu/index.html
